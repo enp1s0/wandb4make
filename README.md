@@ -1,5 +1,7 @@
 # wandb4make
 
+A wandb sweep script for make/cmake projects
+
 ## Sample sweep config
 ```yaml
 program: hp_search.py
@@ -13,6 +15,10 @@ parameters:
     values:
     - 16
     - 32
+  foo:
+    values:
+    - a
+    - b
 ```
 
 ## License
