@@ -143,7 +143,7 @@ if __name__ == '__main__':
     # Run
     p = subprocess.Popen([user_run_command], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
     run_stat = user_output_parse(p, wandb, is_debug)
-    if build_stat != 0:
+    if run_stat != 0:
         print('[INFO] Execution failed')
         if is_debug == False:
             wandb.log('status', 'runtime error')
