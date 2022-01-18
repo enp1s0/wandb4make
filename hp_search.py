@@ -13,16 +13,20 @@ from pydoc import locate
 ###################################################
 # wandb.init(project=project_name)
 project_name = 'hoge'
-project_dir = './test_project'
+project_path = './test_project'
 
 args_table = {
         'hoge' : 'int',
         'foo' : 'str',
         }
+
+# These files are copied to a working directory
 source_files_list = [
         'src',
         'Makefile',
         ]
+
+# This command is executed inside working directiory
 user_run_command = './test.out'
 
 # This funstion is executed inside working directiory
@@ -42,6 +46,7 @@ def user_output_parse(process, wdb, is_debug):
         #    wdb.log('bar', 10)
         yield
 
+# This funstion is executed inside working directiory
 def user_clean(is_debug):
     yield
 
@@ -53,16 +58,22 @@ is_debug = True
 # System function
 ###################################################
 
-def system_shutdown(base_dir, working_dir, is_debug):
+def system_shutdown(base_dir, working_path, is_debug):
     user_clean(is_debug)
     os.chdir(base_dir)
-    shutil.rmtree(working_dir)
+    shutil.rmtree(working_path)
 
 ###################################################
 # Main
 ###################################################
 
 if __name__ == '__main__':
+    if is_debug:
+        print("#################################################")
+        print("# The debug mode is enabled.                    #")
+        print("# All results are not sent to the wandb server. #")
+        print("# To disable debug mode, set is_debug False.    #")
+        print("#################################################")
     base_dir = os.getcwd()
     if (is_debug == False):
         wandb.init(project=project_name)
@@ -87,25 +98,25 @@ if __name__ == '__main__':
     except OSError as error:
         print("[INFO]" + error.strerror)
 
-    working_dir = project_name + '/' + target_name + '/'
+    working_path = project_name + '/' + target_name + '/'
     try:
-        os.mkdir(working_dir)
+        os.mkdir(working_path)
     except OSError as error:
         print('[INFO]' + error.strerror)
-        print('[INFO] Remove ' + working_dir)
-        shutil.rmtree(working_dir)
-        os.mkdir(working_dir)
+        print('[INFO] Remove ' + working_path)
+        shutil.rmtree(working_path)
+        os.mkdir(working_path)
 
     for s in source_files_list:
-        src = project_dir + '/' + s
-        dst = working_dir + '/' + s
+        src = project_path + '/' + s
+        dst = working_path + '/' + s
         print('[INFO] Copy ' + src + ' to ' + dst)
         if os.path.isdir(src):
             shutil.copytree(src, dst)
         else:
             shutil.copy(src, dst)
 
-    os.chdir(working_dir)
+    os.chdir(working_path)
     user_preprocess(vars(args), is_debug)
 
     # Build
@@ -113,7 +124,7 @@ if __name__ == '__main__':
     if build_stat != 0:
         if is_debug == False:
             wandb.log('status', 'build error')
-        system_shutdown(base_dir, working_dir, is_debug)
+        system_shutdown(base_dir, working_path, is_debug)
         exit(0)
 
     # Run
@@ -122,10 +133,10 @@ if __name__ == '__main__':
     if build_stat != 0:
         if is_debug == False:
             wandb.log('status', 'build error')
-        system_shutdown(base_dir, working_dir, is_debug)
+        system_shutdown(base_dir, working_path, is_debug)
         exit(0)
     if is_debug == False:
         wandb.log('status', 'complete')
 
     # Shutdown
-    system_shutdown(base_dir, working_dir, is_debug)
+    system_shutdown(base_dir, working_path, is_debug)
