@@ -118,33 +118,41 @@ if __name__ == '__main__':
             shutil.copytree(src, dst)
         else:
             shutil.copy(src, dst)
+    print('[INFO] Source files were successfully copied')
 
     os.chdir(working_path)
     preprocess_stat = user_preprocess(vars(args), is_debug)
     if preprocess_stat != 0:
+        print('[INFO] Preprocess failed')
         if is_debug == False:
             wandb.log('status', 'preprocess error')
         system_shutdown(base_dir, working_path, is_debug)
         exit(0)
+    print('[INFO] Preprocessing was successfully completed')
 
     # Build
     build_stat = user_build(is_debug)
     if build_stat != 0:
+        print('[INFO] Build failed')
         if is_debug == False:
             wandb.log('status', 'build error')
         system_shutdown(base_dir, working_path, is_debug)
         exit(0)
+    print('[INFO] Build was successfully completed')
 
     # Run
     p = subprocess.Popen([user_run_command], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
     run_stat = user_output_parse(p, wandb, is_debug)
     if build_stat != 0:
+        print('[INFO] Execution failed')
         if is_debug == False:
             wandb.log('status', 'runtime error')
         system_shutdown(base_dir, working_path, is_debug)
         exit(0)
+    print('[INFO] Execution was successfully completed')
     if is_debug == False:
         wandb.log('status', 'complete')
 
     # Shutdown
+    print('[INFO] See you...')
     system_shutdown(base_dir, working_path, is_debug)
