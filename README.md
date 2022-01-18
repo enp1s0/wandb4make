@@ -22,10 +22,16 @@ parameters:
 ```
 
 ## [Optional] Add this projetc to your project
+### Add
 ```bash
 cd your_git_project
 git remote add wandb4make https://github.com/enp1s0/wandb4make
 git subtree add --prefix wandb4make --squash wandb4make main
+```
+
+### Update
+```bash
+git subtree pull --prefix wandb4make --squash wandb4make main
 ```
 
 ## License
