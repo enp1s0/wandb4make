@@ -32,7 +32,8 @@ user_run_command = './test.out'
 # This funstion is executed inside working directiory
 def user_preprocess(args, is_debug):
     # Write arguments to some header files or replace some strings to the arguments
-    yield
+    # When the arguments are invalid, return 1
+    return 0
 
 # This funstion is executed inside working directiory
 def user_build(is_debug):
@@ -44,7 +45,9 @@ def user_output_parse(process, wdb, is_debug):
     for line in process.stdout:
         #if is_debug == False:
         #    wdb.log('bar', 10)
+        # When the output is invalid, return 1
         yield
+    return 0
 
 # This funstion is executed inside working directiory
 def user_clean(is_debug):
@@ -115,28 +118,41 @@ if __name__ == '__main__':
             shutil.copytree(src, dst)
         else:
             shutil.copy(src, dst)
+    print('[INFO] Source files were successfully copied')
 
     os.chdir(working_path)
-    user_preprocess(vars(args), is_debug)
+    preprocess_stat = user_preprocess(vars(args), is_debug)
+    if preprocess_stat != 0:
+        print('[INFO] Preprocess failed')
+        if is_debug == False:
+            wandb.log('status', 'preprocess error')
+        system_shutdown(base_dir, working_path, is_debug)
+        exit(0)
+    print('[INFO] Preprocessing was successfully completed')
 
     # Build
     build_stat = user_build(is_debug)
     if build_stat != 0:
+        print('[INFO] Build failed')
         if is_debug == False:
             wandb.log('status', 'build error')
         system_shutdown(base_dir, working_path, is_debug)
         exit(0)
+    print('[INFO] Build was successfully completed')
 
     # Run
     p = subprocess.Popen([user_run_command], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
     run_stat = user_output_parse(p, wandb, is_debug)
     if build_stat != 0:
+        print('[INFO] Execution failed')
         if is_debug == False:
-            wandb.log('status', 'build error')
+            wandb.log('status', 'runtime error')
         system_shutdown(base_dir, working_path, is_debug)
         exit(0)
+    print('[INFO] Execution was successfully completed')
     if is_debug == False:
         wandb.log('status', 'complete')
 
     # Shutdown
+    print('[INFO] See you...')
     system_shutdown(base_dir, working_path, is_debug)
