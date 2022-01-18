@@ -25,22 +25,27 @@ source_files_list = [
         ]
 user_run_command = './test.out'
 
+# This funstion is executed inside working directiory
 def user_preprocess(args, is_debug):
+    # Write arguments to some header files or replace some strings to the arguments
     yield
 
+# This funstion is executed inside working directiory
 def user_build(is_debug):
-    subprocess.call(["make", "clean"])
-    return subprocess.call(["make", "-j"])
+    #subprocess.call(["make", "clean"])
+    #return subprocess.call(["make", "-j"])
     yield
 
 def user_output_parse(process, wdb, is_debug):
     for line in process.stdout:
-        print(line)
-        # wdb.log('bar', 10)
+        #if is_debug == False:
+        #    wdb.log('bar', 10)
+        yield
 
 def user_clean(is_debug):
     yield
 
+# When this flag is True, all wandb methods are not called
 is_debug = True
 
 
@@ -119,6 +124,8 @@ if __name__ == '__main__':
             wandb.log('status', 'build error')
         system_shutdown(base_dir, working_dir, is_debug)
         exit(0)
+    if is_debug == False:
+        wandb.log('status', 'complete')
 
     # Shutdown
     system_shutdown(base_dir, working_dir, is_debug)
