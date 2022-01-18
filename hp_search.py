@@ -29,6 +29,11 @@ source_files_list = [
 # This command is executed inside working directiory
 user_run_command = './test.out'
 
+# This funstion is executed before source files copy
+def user_check_arguments(args, is_debug):
+    # When the arguments are invalid, return 1
+    return 0
+
 # This funstion is executed inside working directiory
 def user_preprocess(args, is_debug):
     # Write arguments to some header files or replace some strings to the arguments
@@ -87,6 +92,14 @@ if __name__ == '__main__':
         parser.add_argument('--' + n, type=locate(t))
 
     args = parser.parse_args()
+
+    check_arguments_stat = user_check_arguments(vars(args), is_debug)
+    if check_arguments_stat != 0:
+        print('[INFO] Arguments checking failed')
+        if is_debug == False:
+            wandb.log('status', 'invalid arguments')
+        exit(0)
+    print('[INFO] Arguments checking was successfully completed')
 
     target_name = project_name
     for n, _ in args_table.items():
