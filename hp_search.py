@@ -97,7 +97,7 @@ if __name__ == '__main__':
     if check_arguments_stat != 0:
         print('[INFO] Arguments checking failed')
         if is_debug == False:
-            wandb.log('status', 'invalid arguments')
+            wandb.log({'status' : 'invalid arguments'})
         exit(0)
     print('[INFO] Arguments checking was successfully completed')
 
@@ -138,7 +138,7 @@ if __name__ == '__main__':
     if preprocess_stat != 0:
         print('[INFO] Preprocess failed')
         if is_debug == False:
-            wandb.log('status', 'preprocess error')
+            wandb.log({'status' : 'preprocess error'})
         system_shutdown(base_dir, working_path, is_debug)
         exit(0)
     print('[INFO] Preprocessing was successfully completed')
@@ -148,7 +148,7 @@ if __name__ == '__main__':
     if build_stat != 0:
         print('[INFO] Build failed')
         if is_debug == False:
-            wandb.log('status', 'build error')
+            wandb.log({'status' : 'build error'})
         system_shutdown(base_dir, working_path, is_debug)
         exit(0)
     print('[INFO] Build was successfully completed')
@@ -159,12 +159,12 @@ if __name__ == '__main__':
     if run_stat != 0:
         print('[INFO] Execution failed')
         if is_debug == False:
-            wandb.log('status', 'runtime error')
+            wandb.log({'status' : 'runtime error'})
         system_shutdown(base_dir, working_path, is_debug)
         exit(0)
     print('[INFO] Execution was successfully completed')
     if is_debug == False:
-        wandb.log('status', 'complete')
+        wandb.log({'status' : 'complete'})
 
     # Shutdown
     print('[INFO] See you...')
