@@ -11,6 +11,10 @@ from pydoc import locate
 ###################################################
 # User definition
 ###################################################
+
+# When this flag is True, all wandb methods are not called
+is_debug = True
+
 # wandb.init(project=project_name)
 project_name = 'hoge'
 project_path = './test_project'
@@ -44,22 +48,24 @@ def user_preprocess(args, is_debug):
 def user_build(is_debug):
     #subprocess.call(["make", "clean"])
     #return subprocess.call(["make", "-j"])
-    yield
+    return 0
 
 def user_output_parse(process, wdb, is_debug):
     for line in process.stdout:
-        #if is_debug == False:
-        #    wdb.log('bar', 10)
-        # When the output is invalid, return 1
-        yield
+        line = str(line.decode('utf-8')).replace('\n', '')
+
+        result = {
+                #'acc' : float(line)
+                }
+        if is_debug == False:
+            wdb.log(result)
+        else:
+            print(result)
     return 0
 
 # This funstion is executed inside working directiory
 def user_clean(is_debug):
     yield
-
-# When this flag is True, all wandb methods are not called
-is_debug = True
 
 
 ###################################################
