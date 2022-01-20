@@ -11,6 +11,10 @@ from pydoc import locate
 ###################################################
 # User definition
 ###################################################
+
+# When this flag is True, all wandb methods are not called
+is_debug = True
+
 # wandb.init(project=project_name)
 project_name = 'hoge'
 project_path = './test_project'
@@ -57,9 +61,6 @@ def user_output_parse(process, wdb, is_debug):
 # This funstion is executed inside working directiory
 def user_clean(is_debug):
     yield
-
-# When this flag is True, all wandb methods are not called
-is_debug = True
 
 
 ###################################################
