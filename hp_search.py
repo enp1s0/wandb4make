@@ -54,7 +54,9 @@ def user_output_parse(process, wdb, is_debug):
     for line in process.stdout:
         line = str(line.decode('utf-8')).replace('\n', '')
 
-        result = {}
+        result = {
+                #'acc' : float(line)
+                }
         if is_debug == False:
             wdb.log(result)
         else:
