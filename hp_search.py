@@ -35,19 +35,23 @@ user_run_command = './test.out'
 
 # This funstion is executed before source files copy
 def user_check_arguments(args, is_debug):
-    # When the arguments are invalid, return 1
+    # When the arguments are invalid, return other than 0
+    # This returnig value is shown in `status` on the wandb sweep table
     return 0
 
 # This funstion is executed inside working directiory
 def user_preprocess(args, is_debug):
     # Write arguments to some header files or replace some strings to the arguments
-    # When the arguments are invalid, return 1
+    # When the preprocess fails, return other than 0
+    # This value code is shown in `status` on the wandb sweep table
     return 0
 
 # This funstion is executed inside working directiory
 def user_build(is_debug):
     #subprocess.call(["make", "clean"])
     #return subprocess.call(["make", "-j"])
+    # When the build fails, return other than 0
+    # This value code is shown in `status` on the wandb sweep table
     return 0
 
 def user_output_parse(process, wdb, is_debug):
@@ -101,9 +105,9 @@ if __name__ == '__main__':
 
     check_arguments_stat = user_check_arguments(vars(args), is_debug)
     if check_arguments_stat != 0:
-        print('[INFO] Arguments checking failed')
+        print('[INFO] Arguments checking failed (' + str(check_arguments_stat) + ')')
         if is_debug == False:
-            wandb.log({'status' : 'invalid arguments'})
+            wandb.log({'status' : 'invalid arguments (' + str(check_arguments_stat) + ')'})
         exit(0)
     print('[INFO] Arguments checking was successfully completed')
 
@@ -142,9 +146,9 @@ if __name__ == '__main__':
     os.chdir(working_path)
     preprocess_stat = user_preprocess(vars(args), is_debug)
     if preprocess_stat != 0:
-        print('[INFO] Preprocess failed')
+        print('[INFO] Preprocess failed (' + str(preprocess_stat) + ')')
         if is_debug == False:
-            wandb.log({'status' : 'preprocess error'})
+            wandb.log({'status' : 'preprocess error (' + str(preprocess_stat) + ')'})
         system_shutdown(base_dir, working_path, is_debug)
         exit(0)
     print('[INFO] Preprocessing was successfully completed')
@@ -152,9 +156,9 @@ if __name__ == '__main__':
     # Build
     build_stat = user_build(is_debug)
     if build_stat != 0:
-        print('[INFO] Build failed')
+        print('[INFO] Build failed (' + str(build_stat) + ')')
         if is_debug == False:
-            wandb.log({'status' : 'build error'})
+            wandb.log({'status' : 'build error (' + str(build_stat) + ')'})
         system_shutdown(base_dir, working_path, is_debug)
         exit(0)
     print('[INFO] Build was successfully completed')
@@ -163,9 +167,9 @@ if __name__ == '__main__':
     p = subprocess.Popen([user_run_command], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
     run_stat = user_output_parse(p, wandb, is_debug)
     if run_stat != 0:
-        print('[INFO] Execution failed')
+        print('[INFO] Execution failed (' + str(run_stat) + ')')
         if is_debug == False:
-            wandb.log({'status' : 'runtime error'})
+            wandb.log({'status' : 'runtime error (' + str(run_stat) + ')'})
         system_shutdown(base_dir, working_path, is_debug)
         exit(0)
     print('[INFO] Execution was successfully completed')
